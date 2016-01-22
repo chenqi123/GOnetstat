@@ -55,6 +55,13 @@ type Process struct {
     ForeignPort  int64
 }
 
+type Conn struct {
+    State        string
+    Ip           string
+    Port         int64
+    ForeignIp    string
+    ForeignPort  int64
+}
 
 func getData(t string) []string {
     // Get data from tcp or udp file.
@@ -234,6 +241,39 @@ func netstat(t string) []Process {
     return Processes
 }
 
+func netstat2(t string) []Conn {
+    // Return a array of Conn with Name, Ip, Port, State .. etc
+    // Require Root acess to get information about some Connes.
+
+    var Connes []Conn
+
+    data := getData(t)
+
+    for _, line := range(data) {
+
+        // local ip and port
+        line_array := removeEmpty(strings.Split(strings.TrimSpace(line), " "))
+        ip_port := strings.Split(line_array[1], ":")
+        ip := convertIp(ip_port[0])
+        port := hexToDec(ip_port[1])
+
+        // foreign ip and port
+        fip_port := strings.Split(line_array[2], ":")
+        fip := convertIp(fip_port[0])
+        fport := hexToDec(fip_port[1])
+
+        state := STATE[line_array[3]]
+
+
+        p := Conn{state, ip, port, fip, fport}
+
+        Connes = append(Connes, p)
+
+    }
+
+    return Connes
+}
+
 
 func Tcp() []Process {
     // Get a slice of Process type with TCP data
@@ -241,6 +281,11 @@ func Tcp() []Process {
     return data
 }
 
+func Tcp2() []Conn {
+    // Get a slice of Process type with TCP data
+    data := netstat2("tcp")
+    return data
+}
 
 func Udp() []Process {
     // Get a slice of Process type with UDP data

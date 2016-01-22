@@ -29,4 +29,22 @@ func main() {
                                 p.State, pid_program)
          }
     }
+     m := GOnetstat.Tcp2()
+
+     // format header
+     fmt.Printf("Proto %16s %20s %14s \n", "Local Adress", "Foregin Adress",
+                "State")
+
+     for _, p := range(m) {
+
+        // Check STATE to show only Listening connections
+        if p.State == "LISTEN" {
+            // format data like netstat output
+            ip_port := fmt.Sprintf("%v:%v", p.Ip, p.Port)
+            fip_port := fmt.Sprintf("%v:%v", p.ForeignIp, p.ForeignPort)
+
+            fmt.Printf("tcp %16v %20v %16v \n", ip_port, fip_port,
+                                p.State )
+         }
+    }
 }
