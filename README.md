@@ -1,4 +1,12 @@
 # GOnetstat
+## add by chenqi123
+netstat function adjustment:
+To summarize the server connection and client connections
+
+##
+
+
+
 
 Netstat implementation in Golang.
 

@@ -63,6 +63,7 @@ type Conn struct {
     ForeignPort  int64
 }
 
+
 func getData(t string) []string {
     // Get data from tcp or udp file.
 
@@ -241,6 +242,34 @@ func netstat(t string) []Process {
     return Processes
 }
 
+func uniq2(t []string) []string {
+        var t2 []string
+        tt2 := make(map[string]string)
+        //t2=t
+        for _,v := range t {
+                v1 := strings.Split(v, ":")
+                v1_ip := v1[0]
+                v1_port:=v1[1]
+                tt2[v1_ip]=v1_port
+        }
+        for k,_ := range tt2 {
+                if (k!="0.0.0.0") {
+                t2=append(t2,k)
+                }
+        }
+        return t2
+}
+func uniq3(k1 string,v1 []string)(string,string){
+        var kt string
+        var vt string
+        kt=v1[0]
+        kk1 := strings.Split(k1, ":")
+        k1_ip := kk1[0]
+        vt=k1_ip
+        return kt,vt
+}
+
+
 func netstat2(t string) []Conn {
     // Return a array of Conn with Name, Ip, Port, State .. etc
     // Require Root acess to get information about some Connes.
@@ -248,6 +277,9 @@ func netstat2(t string) []Conn {
     var Connes []Conn
 
     data := getData(t)
+    ss := make(map[string][]string)
+    //ref :=make(map[string]bool)
+    //tt :=make(map[string]string)
 
     for _, line := range(data) {
 
@@ -256,11 +288,13 @@ func netstat2(t string) []Conn {
         ip_port := strings.Split(line_array[1], ":")
         ip := convertIp(ip_port[0])
         port := hexToDec(ip_port[1])
+        ip_port1 := ip+":"+strconv.FormatInt(port,10)
 
         // foreign ip and port
         fip_port := strings.Split(line_array[2], ":")
         fip := convertIp(fip_port[0])
         fport := hexToDec(fip_port[1])
+        fip_port1 :=fip+":"+strconv.FormatInt(fport,10)
 
         state := STATE[line_array[3]]
 
@@ -268,9 +302,46 @@ func netstat2(t string) []Conn {
         p := Conn{state, ip, port, fip, fport}
 
         Connes = append(Connes, p)
-
+        ss[ip_port1]=append(ss[ip_port1],fip_port1)
+        /*
+        _,ok :=ss[ip_port1]
+        if ok {
+             ss[ip_port1]=append(ss[ip_port1],fip_port1)
+        } else {
+             ss[ip_port1]=fip_port1
+        }
+        */
+        //fmt.Println(ip_port1,fip_port1)
     }
-
+    var x2 []string
+    var k3 string
+    var v3 string
+    tt3 :=make(map[string]string)
+    for k,v := range ss{
+        if (len(v)>1) {
+                x2=uniq2(v)
+                fmt.Println("server:",k,x2)
+        } else {
+                k3,v3=uniq3(k,v)
+                tt3[k3]=v3
+        }
+    }
+    for k,v :=range tt3 {
+        if(k!="0.0.0.0:0") {
+                fmt.Println("client:",v,k)
+        }
+    }
+    /*
+    for k,v := range ss {
+        v1 := strings.Split(v, ":")
+        v1_ip := v1[0]
+        if _,ok := ref[v]; !ok {
+                ref[v] = true
+                tt[k] = v1_ip
+        }
+   }
+   */
+   //fmt.Println(tt)
     return Connes
 }
 
@@ -286,6 +357,7 @@ func Tcp2() []Conn {
     data := netstat2("tcp")
     return data
 }
+
 
 func Udp() []Process {
     // Get a slice of Process type with UDP data

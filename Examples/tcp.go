@@ -1,7 +1,7 @@
 package main
 
 import (
-    "fmt"
+    //"fmt"
     "github.com/drael/GOnetstat"
 )
 
@@ -10,6 +10,7 @@ import (
    don't have root permissions */
 
 func main() {
+        /*
      d := GOnetstat.Tcp()
 
      // format header
@@ -29,9 +30,12 @@ func main() {
                                 p.State, pid_program)
          }
     }
-     m := GOnetstat.Tcp2()
+   */
+    GOnetstat.Tcp2()
+    //m := GOnetstat.Tcp2()
 
      // format header
+        /*
      fmt.Printf("Proto %16s %20s %14s \n", "Local Adress", "Foregin Adress",
                 "State")
 
@@ -47,4 +51,5 @@ func main() {
                                 p.State )
          }
     }
+    */
 }
